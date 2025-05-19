@@ -1,6 +1,6 @@
 # 📓 notaio
 
-[!scrot](./scrot.png)
+![scrot](./scrot.png)
 
 an oss knowledgebase
 
