@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+
+:root {
+	--bg-primary: oklch(1 0 0);
+	--bg-secondary: oklch(0.98 0.0025 228.78);
+	--fg-primary: oklch(0.19 0.005 240);
+	--fg-secondary: oklch(0.54 0.012 206);
+	--accent: oklch(0.53 0.24 257);
+	--border: oklch(0.925 0.005 70);
+
+	--navbar-height: 3.066rem;
+}
+
+[data-theme='dark'] {
+	--bg-primary: oklch(0.08 0 0);
+	--bg-secondary: oklch(0.18 0 0);
+	--fg-primary: oklch(0.94 0.005 230);
+	--fg-secondary: oklch(0.75 0.01 210);
+	--accent: oklch(0.6 0.16 250);
+	--border: oklch(0.17 0 0);
+}
+
+@theme inline {
+	--font-display: 'Outfit', sans-serif;
+	--font-body: 'Inter', sans-serif;
+	--font-inherit: inherit;
+
+	--color-surface-primary: var(--bg-primary);
+	--color-surface-secondary: var(--bg-secondary);
+
+	--color-fg-primary: var(--fg-primary);
+	--color-fg-secondary: var(--fg-secondary);
+
+	--color-accent: var(--accent);
+	--color-border: var(--border);
+}
+
+body {
+	@apply bg-surface-primary text-fg-primary 
+    font-body text-base leading-6 antialiased box-border
+    transition-colors  ease-in-out;
+
+	font-feature-settings: 'liga', 'kern';
+}
+
+html,
+body {
+	@apply h-full m-0;
+}
+
+@supports (scrollbar-width: auto) {
+	html {
+		scrollbar-color: var(--fg-secondary) var(--bg-primary);
+		scrollbar-width: thin;
+	}
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	@apply font-display font-semibold leading-tight;
+}
+
+p {
+	@apply text-fg-secondary font-normal;
+}
+
+a {
+	@apply text-accent no-underline transition-colors duration-200 ease-in-out;
+}
+
+/* .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.1);
+}
+
+.form-hint {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+} */

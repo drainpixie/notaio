@@ -1,0 +1,63 @@
+@reference "../app.css";
+
+.prose {
+	@apply text-base text-fg-primary leading-relaxed w-6/8 mx-auto;
+
+	& p {
+		@apply mb-4 text-fg-primary;
+	}
+
+	& h1 {
+		@apply text-2xl font-display font-bold;
+	}
+
+	& h2 {
+		@apply text-xl font-display font-bold;
+	}
+
+	& h3 {
+		@apply text-lg font-display font-bold;
+	}
+
+	& h4,
+	& h5,
+	& h6 {
+		@apply text-base font-display font-bold;
+	}
+
+	& ul {
+		@apply list-disc list-inside mb-4 ml-4;
+	}
+
+	& ol {
+		@apply list-decimal list-inside mb-4 ml-4;
+	}
+
+	& a {
+		@apply text-accent no-underline transition-colors ease-in-out hover:underline;
+	}
+
+	& blockquote {
+		@apply border-l border-border pl-3 mb-4;
+	}
+
+	& hr {
+		@apply border-t border-border my-4;
+	}
+
+	& table {
+		@apply w-full text-left text-sm;
+	}
+
+	& th {
+		@apply border-b border-border border-solid font-semibold py-1;
+	}
+
+	& td {
+		@apply py-1;
+	}
+
+	& strong {
+		@apply font-bold text-fg-primary;
+	}
+}

@@ -1,0 +1,3 @@
+* finish porting old css to tailwindcss
+* adapt old forms to our form components
+* split markdown editor

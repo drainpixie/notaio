@@ -1,0 +1,72 @@
+import * as lucide from 'lucide-svelte';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeKatex from 'rehype-katex';
+import rehypeStringify from 'rehype-stringify';
+import remarkBreaks from 'remark-breaks';
+import remarkGemoji from 'remark-gemoji';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import { unified } from 'unified';
+import { nanoid } from 'nanoid';
+
+/**
+ * TODO:
+ *
+ * const OPEN_AI_REGEX = /^sk-[A-Za-z0-9]{20,}$/;
+ * const ANTROPHIC_REGEX = /^claude-[A-Za-z0-9_-]{20,}$/;
+ *
+ */
+
+export const generateID = (title: string) => [title.toLowerCase().replace(/\s+/g, '_') + '_' + nanoid(), title];
+
+
+export const PROCESSOR = unified()
+	.use(remarkBreaks)
+	.use(remarkGfm)
+	.use(remarkMath)
+	.use(remarkParse)
+	.use(remarkRehype)
+	.use(remarkGemoji)
+	.use(rehypeKatex)
+	.use(rehypeHighlight)
+	.use(rehypeStringify);
+
+// eslint-disable no-useless-escape
+export const KATEX_REGEX = /\$+([^\$]*?)\$+/g;
+
+export const MARKDOWN_DEFAULT_VALUE = [
+	'# Notaio',
+	'',
+	'This is an example inspired by [GitHub](https://github.com)',
+	'',
+	'```js',
+	'const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];',
+	'const evens = xs.filter(x => x % 2 === 0);',
+	'',
+	'console.log(evens);',
+	'```',
+	'',
+	'```python',
+	'xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]',
+	'evens = list(filter(lambda x: x % 2 == 0, xs))',
+	'',
+	'print(evens)',
+	'```',
+	'',
+	'Lift($L$) can be determined by Lift Coefficient ($C_L$) like the following equation $L = \\frac{1}{2} \\rho v^2 S C_L$',
+	'Take $\\tfrac{1}{2}$ cup of sugar, …; $3 \\times \\tfrac{1}{2} = 1 \\tfrac{1}{2}$',
+	'',
+	'$$',
+	'\\begin{align*}',
+	'\\textbf{Inverse Fourier Transform = } ',
+	'f(x) &= \\int_{-\\infty}^\\infty ',
+	'\\\\',
+	'&\\quad \\hat{f}(\\xi), e^{2 \\pi i \\xi x} \\, d\\xi',
+	'\\end{align*}',
+	'$$'
+].join('\n');
+
+export const getLucideIcon = (name: string): typeof lucide.Component =>
+	lucide[name as keyof typeof lucide] as typeof lucide.Component;
