@@ -43,6 +43,7 @@ export const PROCESSOR = unified()
 
 // eslint-disable-next-line no-useless-escape
 export const KATEX_REGEX = /\$+([^\$]*?)\$+/g;
+export const CODE_BLOCK_REGEX = /^```(\w*)\n([\s\S]*?)```$/;
 
 export const MARKDOWN_DEFAULT_VALUE = [
 	'# Notaio',

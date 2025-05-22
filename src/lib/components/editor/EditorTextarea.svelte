@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { KATEX_REGEX } from '$lib';
+	import { CODE_BLOCK_REGEX, KATEX_REGEX } from '$lib';
+	import EditorHighlighter from './EditorHighlighter.svelte';
+
 	import hljs from 'highlight.js';
 	import { onMount, tick } from 'svelte';
-	import EditorHighlighter from './EditorHighlighter.svelte';
 
 	interface Props {
 		value: string;
@@ -10,6 +11,11 @@
 		onTextChange: (text: string) => void;
 		onUndo: () => void;
 		onRedo: () => void;
+	}
+
+	interface Segment {
+		type: 'markdown' | 'math';
+		content: string;
 	}
 
 	let {
@@ -49,97 +55,85 @@
 		const scrollHeight = target.scrollHeight;
 		const clientHeight = target.clientHeight;
 
-		if (scrollTop + clientHeight >= scrollHeight) {
-			target.scrollTop = scrollHeight - clientHeight;
-		}
+		if (scrollTop + clientHeight >= scrollHeight) target.scrollTop = scrollHeight - clientHeight;
 	}
 
-	function updateHighlight() {
-		const segments = [];
-		let currentPos = 0;
-		let match: RegExpExecArray | null = null;
+	function updateHighlight(): void {
+		const html = parseContent(value);
 
-		KATEX_REGEX.lastIndex = 0;
-
-		while ((match = KATEX_REGEX.exec(value)) !== null) {
-			if (match.index > currentPos) {
-				segments.push({
-					type: 'markdown',
-					content: value.substring(currentPos, match.index)
-				});
-			}
-
-			segments.push({
-				type: 'math',
-				content: match[0]
-			});
-
-			currentPos = match.index + match[0].length;
-		}
-
-		if (currentPos < value.length) {
-			segments.push({
-				type: 'markdown',
-				content: value.substring(currentPos)
-			});
-		}
-
-		let highlightedHTML = '';
-
-		for (const { type, content } of segments) {
-			if (type === 'markdown') {
-				highlightedHTML += hljs.highlight(content, {
-					language: 'markdown'
-				}).value;
-			} else {
-				highlightedHTML += `<span class="hljs language-katex">${hljs.highlight(content, { language: 'latex' }).value}</span>`;
-			}
-		}
-
-		const doc = Document.parseHTMLUnsafe(highlightedHTML);
+		const doc = Document.parseHTMLUnsafe(html);
 		processCodeBlocks(doc);
+
 		highlighted = doc.body.innerHTML.replace(/\n/g, '<br>');
 	}
 
-	function processCodeBlocks(doc: Document) {
-		for (const span of doc.querySelectorAll('span.hljs-code')) {
-			const spanText = span.textContent ?? '';
-			const match = spanText.match(/^```(\w*)\n([\s\S]*?)```$/);
+	function parseContent(text: string) {
+		KATEX_REGEX.lastIndex = 0;
 
-			if (match) {
-				const [, lang, code] = match;
-				const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-				const innerHtml = hljs.highlight(code, { language }).value;
+		let currentPos = 0;
+		let match: RegExpExecArray | null;
 
-				const fragment = document.createDocumentFragment();
+		const segments: Segment[] = [];
+		while ((match = KATEX_REGEX.exec(text)) !== null) {
+			if (match.index > currentPos)
+				segments.push({ type: 'markdown', content: text.substring(currentPos, match.index) });
 
-				const openFence = document.createElement('span');
-				openFence.className = 'fence backticks';
-				openFence.textContent = `\`\`\`${lang}\n`;
-				fragment.appendChild(openFence);
+			segments.push({ type: 'math', content: match[0] });
+			currentPos = match.index + match[0].length;
+		}
 
-				const pre = document.createElement('pre');
-				pre.className = `hljs language-${language}`;
-				const codeEl = document.createElement('code');
-				codeEl.innerHTML = innerHtml;
-				pre.appendChild(codeEl);
-				fragment.appendChild(pre);
+		if (currentPos < text.length)
+			segments.push({ type: 'markdown', content: text.substring(currentPos) });
 
-				const closeFence = document.createElement('span');
-				closeFence.className = 'fence backticks';
-				closeFence.textContent = '```';
-				fragment.appendChild(closeFence);
+		return segments
+			.map(({ type, content }) =>
+				type === 'markdown'
+					? hljs.highlight(content, { language: 'markdown' }).value
+					: `<span class="hljs language-katex">${hljs.highlight(content, { language: 'latex' }).value}</span>`
+			)
+			.join('');
+	}
 
-				span.replaceWith(fragment);
-			}
+	function processCodeBlocks(doc: Document): void {
+		const codeSpans = doc.querySelectorAll('span.hljs-code');
+
+		for (const span of codeSpans) {
+			const spanText = span.textContent || '';
+			const match = spanText.match(CODE_BLOCK_REGEX);
+
+			if (!match) return;
+
+			const [, lang, code] = match;
+			const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+
+			const fragment = document.createDocumentFragment();
+
+			appendElement(fragment, 'span', {
+				className: 'fence backticks',
+				textContent: `\`\`\`${lang}\n`
+			});
+
+			const pre = appendElement(fragment, 'pre', { className: `hljs language-${language}` });
+
+			appendElement(pre, 'code', { innerHTML: hljs.highlight(code, { language }).value });
+			appendElement(fragment, 'span', { className: 'fence backticks', textContent: '```' });
+
+			span.replaceWith(fragment);
 		}
 	}
 
-	function handleFocus() {
-		if (window.getSelection()?.toString() && textarea) {
-			textarea.focus();
-		}
+	function appendElement<K extends keyof HTMLElementTagNameMap>(
+		parent: Node,
+		tagName: K,
+		properties: Partial<HTMLElementTagNameMap[K]> = {}
+	): HTMLElementTagNameMap[K] {
+		const element = document.createElement(tagName);
+		Object.assign(element, properties);
+		parent.appendChild(element);
+		return element;
 	}
+
+	const handleFocus = () => window.getSelection()?.toString() && textarea && textarea.focus();
 
 	$effect(() => {
 		updateHighlight();
