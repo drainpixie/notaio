@@ -157,7 +157,7 @@
 
 	<textarea
 		id="markdown"
-		class="whitespace-pre-wrap break-words font-mono leading-normal relative w-full resize-none transition-colors ease-in-out field-sizing-content caret-accent bg-transparent text-transparent z-10 focus:outline-none"
+		class="whitespace-pre-wrap break-words font-mono leading-normal relative w-full resize-none transition-colors ease-modern field-sizing-content caret-accent bg-transparent text-transparent z-10 focus:outline-none"
 		bind:value
 		bind:this={textarea}
 		onscroll={syncScroll}

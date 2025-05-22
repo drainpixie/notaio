@@ -1,23 +1,43 @@
 <script lang="ts">
-	import { getLucideIcon } from '$lib';
 	import Editor from '$lib/components/editor/Editor.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { Search, SortAsc } from 'lucide-svelte';
 	import type { PageData } from './$types';
+	import IconPicker from '$lib/components/IconPicker.svelte';
 
 	interface Props {
 		data: PageData;
+
+		title: string;
+		icon: string;
 	}
 
 	let { data }: Props = $props();
-	let activeNote = $state(data.notes[0]);
+
+	let notes = $state(data.notes);
+	let activeNote = $state(notes[0]);
 
 	function handleNoteClick(event: MouseEvent) {
 		const id = (event.currentTarget as HTMLButtonElement).value;
-		const note = data.notes.find((note) => note.id === id);
+		const note = notes.find((note) => note.id === id);
 
 		if (note) activeNote = note;
 	}
+
+	function debounce(func: () => void, wait: number) {
+		let timeout: NodeJS.Timeout;
+
+		return () => {
+			clearTimeout(timeout);
+			timeout = setTimeout(func, wait);
+		};
+	}
+
+	$effect(() => {
+		document.title = activeNote.title;
+
+		return () => document.title = "Notaio";
+	});
 </script>
 
 <Sidebar>
@@ -32,9 +52,7 @@
 		</button>
 	{/snippet}
 
-	{#each data.notes as note (note.id)}
-		{@const Icon = getLucideIcon(note.icon)}
-
+	{#each notes as note (note.id)}
 		<button
 			class:active={note.id === activeNote.id}
 			onclick={handleNoteClick}
@@ -42,8 +60,8 @@
 			title={note.title}
 			value={note.id}
 		>
-			<Icon size={16} />
-			<span>{note.title}</span>
+			<IconPicker bind:selectedIcon={note.icon} />
+			<span bind:textContent={note.title} spellcheck="false" class="outline-none caret-accent" contenteditable></span>
 		</button>
 	{/each}
 </Sidebar>
@@ -58,7 +76,7 @@
 	button {
 		@apply bg-transparent text-fg-primary border-none 
            m-1.5 p-2 rounded-md cursor-pointer transition-all
-           ease-in-out text-xs font-normal font-display 
+           ease-modern text-xs font-normal font-display 
            text-left flex items-center gap-2;
 
 		@apply hover:bg-surface-secondary hover:text-fg-primary;

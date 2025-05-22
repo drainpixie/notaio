@@ -79,3 +79,18 @@ export const MARKDOWN_DEFAULT_VALUE = [
 
 export const getLucideIcon = (name: string): typeof lucide.Component =>
 	lucide[name as keyof typeof lucide] as typeof lucide.Component;
+
+export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(
+  func: F,
+  waitFor: number,
+) => {
+  let timeout: NodeJS.Timeout
+
+  const debounced = (...args: Parameters<F>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), waitFor)
+  }
+
+  return debounced
+}
+

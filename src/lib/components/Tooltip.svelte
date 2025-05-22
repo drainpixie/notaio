@@ -70,7 +70,7 @@
 	{#if isVisible}
 		<div
 			bind:this={tooltipElement}
-			class="fixed bg-surface-secondary text-fg-primary px-2 py-3 rounded-md text-sm whitespace-nowrap z-[1000] border border-border border-solid pointer-events-none font-medium tooltip-animation"
+			class="fixed bg-surface-secondary text-fg-primary px-2 py-3 rounded-md text-sm whitespace-nowrap z-[1000] border border-border border-solid pointer-events-none font-medium tooltip-animation transition-colors ease-modern duration-200"
 			style="
           left: {direction.horizontal === 'right'
 				? mouseX + offset

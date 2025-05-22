@@ -11,7 +11,7 @@
 
 <div
 	class="bg-surface-primary rounded-md border-border border-solid border p-8
-            transition-colors ease-in-out"
+            transition-colors ease-modern"
 >
 	{#if title}
 		{#if typeof title === 'string'}

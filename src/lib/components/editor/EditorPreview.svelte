@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="break-normal font-body preview transition-colors ease-in-out prose h-full w-full overflow-auto"
+	class="break-normal font-body preview transition-colors ease-modern prose h-full w-full overflow-auto"
 >
 	<!-- eslint-disable svelte/no-at-html-tags -->
 	{@html html}
@@ -29,11 +29,11 @@
 	@reference "../../../app.css";
 
 	:global(.preview code) {
-		@apply font-mono transition-colors ease-in-out;
+		@apply font-mono transition-colors ease-modern;
 	}
 
 	:global(.preview pre) {
-		@apply p-4 my-2 overflow-x-auto rounded-md bg-surface-primary border border-border transition-colors ease-in-out;
+		@apply p-4 my-2 overflow-x-auto rounded-md bg-surface-primary border border-border transition-colors ease-modern;
 	}
 
 	:global(.preview pre code) {

@@ -116,7 +116,7 @@
 	/>
 
 	<div
-		class="flex p-4 bg-surface-primary text-fg-primary text-base w-full relative transition-colors ease-in-out"
+		class="flex p-4 bg-surface-primary text-fg-primary text-base w-full relative transition-colors ease-modern"
 	>
 		{#if editor.mode === 'write'}
 			<EditorTextarea

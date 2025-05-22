@@ -11,6 +11,6 @@
 	@reference "../../../app.css";
 
 	:global(.highlight-layer pre, .highlight-layer code, .highlight-layer.hljs.language-katex) {
-		@apply border-none m-0 p-0 bg-transparent transition-colors ease-in-out block;
+		@apply border-none m-0 p-0 bg-transparent transition-colors ease-modern block;
 	}
 </style>

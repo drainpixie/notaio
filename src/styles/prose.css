@@ -4,7 +4,7 @@
 	@apply text-base text-fg-primary leading-relaxed w-6/8 mx-auto;
 
 	& p {
-		@apply mb-4 text-fg-primary;
+		@apply mb-4 text-fg-primary  transition-colors duration-200 ease-modern;
 	}
 
 	& h1 {
@@ -34,7 +34,7 @@
 	}
 
 	& a {
-		@apply text-accent no-underline transition-colors ease-in-out hover:underline;
+		@apply text-accent no-underline transition-colors ease-modern hover:underline;
 	}
 
 	& blockquote {

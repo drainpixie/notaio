@@ -11,7 +11,7 @@
 
 <div
 	class="fixed top-0 left-0 w-40 h-full bg-surface-primary text-fg-primary border-r border-border
-            z-50 flex flex-col transition-colors ease-in-out"
+            z-50 flex flex-col transition-colors ease-modern"
 >
 	<div class="flex flex-col mt-14">
 		{@render header?.()}

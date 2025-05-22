@@ -87,7 +87,7 @@
 
 	ul a,
 	:global(#theme-toggle) {
-		@apply text-fg-primary no-underline transition-colors ease-in-out p-2 rounded-md cursor-pointer
+		@apply text-fg-primary no-underline transition-colors ease-modern p-2 rounded-md cursor-pointer
            flex items-center justify-center relative hover:bg-surface-secondary [.active]:bg-surface-secondary;
 	}
 </style>

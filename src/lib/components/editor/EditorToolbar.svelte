@@ -37,7 +37,7 @@
 </script>
 
 <div
-	class="flex justify-between items-center p-2 bg-surface-primary border-border border-b border-solid transition-colors ease-in-out"
+	class="flex justify-between items-center p-2 bg-surface-primary border-border border-b border-solid transition-colors ease-modern"
 >
 	<div class="flex items-center gap-2">
 		<Tooltip text="Preview">
@@ -65,7 +65,7 @@
 			</button>
 		</Tooltip>
 
-		<div class="w-px h-6 bg-border mx-2"></div>
+		<div class="w-px h-6 bg-border mx-2 transition-colors ease-modern"></div>
 
 		<Tooltip text="Undo">
 			<button
@@ -119,7 +119,7 @@
 
 	.toolbar-button {
 		@apply border-none text-fg-primary cursor-pointer p-2 rounded-md 
-	 		transition-colors ease-in-out flex items-center 
+	 		transition-colors ease-modern flex items-center 
 			justify-center text-base font-normal font-display;
 	}
 

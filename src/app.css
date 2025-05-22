@@ -13,11 +13,11 @@
 
 [data-theme='dark'] {
 	--bg-primary: oklch(0.08 0 0);
-	--bg-secondary: oklch(0.18 0 0);
+	--bg-secondary: oklch(0.2 0 0);
 	--fg-primary: oklch(0.94 0.005 230);
 	--fg-secondary: oklch(0.75 0.01 210);
 	--accent: oklch(0.6 0.16 250);
-	--border: oklch(0.17 0 0);
+	--border: oklch(0.2 0 0);
 }
 
 @theme inline {
@@ -33,12 +33,14 @@
 
 	--color-accent: var(--accent);
 	--color-border: var(--border);
+
+	--ease-modern: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
 	@apply bg-surface-primary text-fg-primary 
     font-body text-base leading-6 antialiased box-border
-    transition-colors  ease-in-out;
+    transition-colors  ease-modern;
 
 	font-feature-settings: 'liga', 'kern';
 }
@@ -69,14 +71,14 @@ p {
 }
 
 a {
-	@apply text-accent no-underline transition-colors duration-200 ease-in-out;
+	@apply text-accent no-underline transition-colors duration-200 ease-modern;
 }
 
 input {
 	@apply w-full px-3 py-2 !border !border-border !border-solid rounded-md
 		   bg-surface-primary text-fg-primary
 		   font-body text-base box-border
-		   transition-colors duration-200 ease-in-out;
+		   transition-colors duration-200 ease-modern;
 
 	font-feature-settings: 'liga', 'kern';
 }

@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { getLucideIcon } from '$lib';
-	import { clickOutside } from '$lib/actions/clickOutside';
 	import * as lucide from 'lucide-svelte';
 	import Tooltip from './Tooltip.svelte';
+	import Popup from './Popup.svelte';
 
 	let {
 		selectedIcon = $bindable('FileQuestion'),
-		size = $bindable(20),
+		size = $bindable(16),
 		gridCols = $bindable(5),
 		showSearch = $bindable(true),
-		itemHeight = $bindable(40),
+		itemHeight = $bindable(16),
 		visibleRows = $bindable(5)
 	} = $props();
 
 	let searchQuery = $state('');
-	let isOpen = $state(false);
-	let containerElement = $state<HTMLElement | null>(null);
+	let containerRef = $state<HTMLElement | null>(null);
 	let scrollTop = $state(0);
+	let isOpen = $state(false);
 
 	const iconNames = Object.keys(lucide).filter(
 		(name) =>
@@ -49,47 +49,38 @@
 		isOpen = false;
 	}
 
-	function handler() {
-		isOpen = !isOpen;
-	}
-
 	$effect(() => {
-		if (containerElement && filteredIcons) {
-			containerElement.scrollTop = 0;
+		if (containerRef && filteredIcons) {
+			containerRef.scrollTop = 0;
 			scrollTop = 0;
 		}
+
+		// selectedIcon = selectedIcon;
 	});
 </script>
 
-<div class="relative" use:clickOutside={{ handler: () => (isOpen = false) }}>
-	<button
-		type="button"
-		class="flex items-center gap-2 p-3 w-full rounded-lg border border-solid border-border bg-surface-primary cursor-pointer transition-all duration-200 hover:bg-surface-secondary"
-		onclick={handler}
-		aria-label="Select icon"
-	>
-		<!-- svelte-ignore svelte_component_deprecated -->
-		<svelte:component this={getLucideIcon(selectedIcon)} {size} id="selected-icon" />
-		<span class="text-base font-medium text-fg-primary">{selectedIcon}</span>
-	</button>
+<Popup bind:isOpen>
+	{#snippet trigger()}
+		{@const Icon = getLucideIcon(selectedIcon)}
+		<Icon {size} id="selected-icon" />
+	{/snippet}
 
-	{#if isOpen}
+	{#snippet content()}
 		<div
-			class="absolute top-[calc(100%+0.5rem)] left-0 max-h-52 overflow-hidden bg-surface-primary border border-border border-solid rounded-md z-[100] p-2"
-			bind:this={containerElement}
+			class="max-h-52 overflow-hidden bg-surface-primary border border-border border-solid rounded-md p-2 w-full"
+			bind:this={containerRef}
 			onscroll={handleScroll}
 		>
 			{#if showSearch}
 				<div
-					class="flex items-center gap-2 p-2 border-b border-border border-solid mb-2 sticky top-0 bg-surface-primary z-20"
+					class="flex items-center gap-2 mb-2 sticky top-0 bg-surface-primary z-20"
 				>
-					<lucide.Search size={16} />
 					<input
 						type="text"
-						placeholder="Search icons..."
+						placeholder="Search..."
 						bind:value={searchQuery}
 						autocomplete="off"
-						class="w-full bg-transparent text-fg-primary outline-none"
+						class="w-full bg-transparent text-fg-primary outline-none caret-accent"
 					/>
 				</div>
 			{/if}
@@ -104,11 +95,10 @@
 						<Tooltip text={iconName}>
 							<button
 								type="button"
-								class="flex items-center justify-center p-2 bg-transparent border-transparent border-solid border text-fg-primary rounded-sm cursor-pointer transition-colors ease-in-out hover:bg-surface-secondary"
+								class="flex items-center justify-center p-2 bg-transparent border-transparent border-solid border text-fg-primary rounded-sm cursor-pointer transition-colors ease-modern hover:bg-surface-secondary"
 								class:selected={iconName === selectedIcon}
 								onclick={() => selectIcon(iconName)}
 								aria-label={iconName}
-								style="height: {itemHeight}px;"
 							>
 								<Icon {size} />
 							</button>
@@ -117,8 +107,8 @@
 				</div>
 			</div>
 		</div>
-	{/if}
-</div>
+	{/snippet}
+</Popup>
 
 <style lang="postcss">
 	@reference "../../app.css";

@@ -12,7 +12,7 @@
 
 <header class="sticky top-0 z-100 h-[var(--navbar-height)] w-full">
 	<nav
-		class="bg-surface-primary text-fg-primary py-2 border-b border-border transition-colors ease-in-out"
+		class="bg-surface-primary text-fg-primary py-2 border-b border-border transition-colors ease-modern"
 	>
 		<div class="flex justify-between items-center px-4">
 			<div class="flex items-center gap-2">
