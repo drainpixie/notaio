@@ -4,7 +4,7 @@ import { note } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
-import { generateID, MARKDOWN_DEFAULT_VALUE } from '$lib';
+import { MARKDOWN_DEFAULT_VALUE } from '$lib';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
@@ -12,22 +12,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	let notes = await db.select().from(note).where(eq(note.userId, user.id)).execute();
 	if (notes.length === 0) {
-		const [id, title] = generateID('Untitled');
-		notes = await db.insert(note).values({
-			id,
-			title,
-			content: MARKDOWN_DEFAULT_VALUE,
-			userId: user.id,
-			tags: [],
-			icon: 'FileQuestion',
-			createdAt: new Date(),
-			updatedAt: new Date()
-		}).returning().execute();
+		notes = await db
+			.insert(note)
+			.values({
+				content: MARKDOWN_DEFAULT_VALUE,
+				userId: user.id,
+				tags: [],
+				icon: 'FileQuestion',
+				createdAt: new Date(),
+				updatedAt: new Date()
+			})
+			.returning()
+			.execute();
 	}
 
 	return {
 		user,
-		notes,
+		notes
 	};
 };
 

@@ -1,8 +1,8 @@
 <!-- TODO: DOMPurify -->
+<!-- TODO: Split in multiple components -->
+<!-- Auto-updating WYSIWYG for title, content, and settings -->
 
 <script lang="ts">
-	// TODO: Split in multiple components
-
 	import { KATEX_REGEX, MARKDOWN_DEFAULT_VALUE, PROCESSOR } from '$lib';
 	import type { Note } from '$lib/server/db/schema';
 	import { can, createStack, execute, redo, undo } from '@pixie/rekishi';
@@ -18,15 +18,12 @@
 		List,
 		ListChecks,
 		ListOrdered,
-		Notebook,
 		Pencil,
 		Quote,
 		Settings,
 		Strikethrough
 	} from 'lucide-svelte';
 	import { onMount, tick } from 'svelte';
-	import Card from '../Card.svelte';
-	import NoteSettingsForm from '../forms/NoteSettingsForm.svelte';
 	import Tooltip from '../Tooltip.svelte';
 	import EditorHighlighter from './EditorHighlighter.svelte';
 	import Markdown from './Markdown.svelte';
@@ -311,20 +308,6 @@
 		});
 	});
 </script>
-
-{#if settingsOpen}
-	<div
-		class="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000] flex items-center justify-center text-fg-primary rounded-md"
-	>
-		<Card>
-			{#snippet title()}
-				<h1><Notebook /> Settings</h1>
-			{/snippet}
-
-			<NoteSettingsForm bind:note bind:open={settingsOpen} />
-		</Card>
-	</div>
-{/if}
 
 <div class="bg-surface-primary">
 	<div

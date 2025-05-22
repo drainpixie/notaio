@@ -1,10 +1,8 @@
-import { generateID } from '$lib';
 import { validateSessionFromCookies } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { type Note, note } from '$lib/server/db/schema';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error, json } from '@sveltejs/kit';
-import { randomUUID } from 'crypto';
 import { and, eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -28,9 +26,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	if (tags.some((tag: string) => tag.length > 255)) return error(400, { message: 'Tag too long' });
 
-	const [id] = generateID(title);
 	const body = {
-		id,
 		icon,
 		tags,
 		title,

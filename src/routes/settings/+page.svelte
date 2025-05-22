@@ -1,24 +1,63 @@
 <script lang="ts">
-	import Card from '$lib/components/Card.svelte';
-	import SettingsForm from '$lib/components/forms/SettingsForm.svelte';
-	import type { ActionData } from '../$types';
+	import type { PageData } from './$types';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { schema } from './schema';
+	import { Control, Description, Field, FieldErrors, Label } from 'formsnap';
+	import Button from '$lib/components/Button.svelte';
+	import { Save } from 'lucide-svelte';
 
-	const { form }: { form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
+
+	const form = superForm(data.form, {
+		validators: zodClient(schema),
+		resetForm: false
+	});
+
+	const { form: formData, enhance } = form;
 </script>
 
-<div class="settings-container">
-	<Card title="Settings">
-		<SettingsForm {form} />
-	</Card>
-</div>
+<form method="post" class="w-96" use:enhance>
+	<Field {form} name="apiKey">
+		<Control>
+			{#snippet children({ props })}
+				<Label>API Key</Label>
+				<input {...props} type="text" bind:value={$formData.apiKey} />
+			{/snippet}
+		</Control>
+		<Description>An OpenAI API key (e.g: sk-xxxxxxxxxxxxxxxxxxx)</Description>
+		<FieldErrors />
+	</Field>
 
-<style>
-	.settings-container {
-		padding: 2rem;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-</style>
+	<Field {form} name="baseURL">
+		<Control>
+			{#snippet children({ props })}
+				<Label>Base URL</Label>
+				<input {...props} type="text" bind:value={$formData.baseURL} autocomplete="url" />
+			{/snippet}
+		</Control>
+		<Description>The base URL of your endpoint</Description>
+		<FieldErrors />
+	</Field>
+
+	<Field {form} name="authorizationHeader">
+		<Control>
+			{#snippet children({ props })}
+				<Label>Authorization Header</Label>
+				<input {...props} type="text" bind:value={$formData.authorizationHeader} />
+			{/snippet}
+		</Control>
+		<Description>X-API-Key Antrophic, Authorization OpenAI</Description>
+		<FieldErrors />
+	</Field>
+
+	<div class="flex w-full gap-4 mt-2">
+		<Button type="submit" class="grow">
+			{#snippet iconL()}
+				<Save size={18} />
+			{/snippet}
+
+			Save
+		</Button>
+	</div>
+</form>

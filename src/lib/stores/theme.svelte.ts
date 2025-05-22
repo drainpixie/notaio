@@ -36,7 +36,6 @@ export function initTheme() {
 	}
 }
 
-// TODO: Use this!
 export function setHighlighting(newHighlight: Highlighting) {
 	highlight = newHighlight;
 

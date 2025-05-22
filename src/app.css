@@ -72,41 +72,47 @@ a {
 	@apply text-accent no-underline transition-colors duration-200 ease-in-out;
 }
 
-/* .form-group {
-  margin-bottom: 1.5rem;
+input {
+	@apply w-full px-3 py-2 !border !border-border !border-solid rounded-md
+		   bg-surface-primary text-fg-primary
+		   font-body text-base box-border
+		   transition-colors duration-200 ease-in-out;
+
+	font-feature-settings: 'liga', 'kern';
 }
 
-.form-label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-weight: 600;
-  text-align: left;
+input:focus {
+	@apply outline-none border-accent;
+	box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 10%, transparent);
 }
 
-.form-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+input:disabled {
+	@apply opacity-50 cursor-not-allowed;
+	background-color: var(--bg-secondary);
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.1);
+[data-fs-label] {
+	@apply block mb-1 font-display font-semibold text-fg-primary
+		   text-sm leading-tight;
 }
 
-.form-hint {
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-} */
+input[data-fs-error]  {
+	@apply border-red-500;
+	box-shadow: 0 0 0 2px color-mix(in oklch, red 10%, transparent);
+}
+
+[data-fs-field-errors] {
+	@apply mt-1 space-y-1 mb-1;
+}
+
+[data-fs-field-error] {
+	@apply text-red-600 text-sm font-medium;
+}
+
+[data-fs-description] {
+	@apply block mt-1 text-fg-secondary text-xs;
+}
+
+[data-theme='dark'] [data-fs-field-error] {
+	@apply text-red-400;
+}

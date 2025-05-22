@@ -10,7 +10,7 @@
 	}
 
 	let { data }: Props = $props();
-  let activeNote = $state(data.notes[0]);
+	let activeNote = $state(data.notes[0]);
 
 	function handleNoteClick(event: MouseEvent) {
 		const id = (event.currentTarget as HTMLButtonElement).value;
@@ -32,7 +32,7 @@
 		</button>
 	{/snippet}
 
-	{#each data.notes as note}
+	{#each data.notes as note (note.id)}
 		{@const Icon = getLucideIcon(note.icon)}
 
 		<button

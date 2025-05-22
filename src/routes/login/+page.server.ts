@@ -2,21 +2,12 @@ import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { hash, verify } from '@node-rs/argon2';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { z } from 'zod';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
-
-const schema = z.object({
-	username: z
-		.string()
-		.min(3)
-		.max(30)
-		.trim()
-		.regex(/^[a-zA-Z0-9]+$/),
-	password: z.string().min(6).max(30).trim()
-});
+import { schema } from './schema';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
@@ -24,33 +15,29 @@ export const load: PageServerLoad = async (event) => {
 		return redirect(302, redirectTo);
 	}
 
+	const form = await superValidate(zod(schema));
+
 	return {
+		form,
 		redirectTo: event.url.searchParams.get('redirectTo') || '/'
 	};
 };
 
 export const actions: Actions = {
 	login: async (event) => {
-		const formData = await event.request.formData();
-		const username = formData.get('username')?.toString() ?? '';
-		const password = formData.get('password')?.toString() ?? '';
+		const form = await superValidate(event, zod(schema));
+		if (!form.valid) return fail(400, { form });
 
-		const form = schema.safeParse({ username, password });
-
-		if (!form.success)
-			return fail(400, {
-				errors: form.error.flatten().fieldErrors,
-				values: { username },
-				message: 'Invalid form data'
-			});
+		const { username, password } = form.data;
 
 		const results = await db.select().from(table.user).where(eq(table.user.username, username));
-
 		const existing = results.at(0);
 		if (!existing)
 			return fail(400, {
-				values: { username },
-				message: 'Incorrect username or password'
+				form: {
+					...form,
+					message: 'Incorrect username or password'
+				}
 			});
 
 		const valid = await verify(existing.passwordHash, password, {
@@ -62,8 +49,10 @@ export const actions: Actions = {
 
 		if (!valid)
 			return fail(400, {
-				values: { username },
-				message: 'Incorrect username or password'
+				form: {
+					...form,
+					message: 'Incorrect username or password'
+				}
 			});
 
 		const sessionToken = auth.generateSessionToken();
@@ -74,28 +63,21 @@ export const actions: Actions = {
 		return redirect(302, redirectTo);
 	},
 	register: async (event) => {
-		const formData = await event.request.formData();
-		const username = formData.get('username')?.toString() ?? '';
-		const password = formData.get('password')?.toString() ?? '';
+		const form = await superValidate(event, zod(schema));
 
-		const form = schema.safeParse({ username, password });
+		if (!form.valid) return fail(400, { form });
 
-		if (!form.success)
-			return fail(400, {
-				errors: form.error.flatten().fieldErrors,
-				values: { username },
-				message: 'Invalid form data'
-			});
+		const { username, password } = form.data;
 
 		const existing = await db.select().from(table.user).where(eq(table.user.username, username));
-
 		if (existing.length > 0)
 			return fail(400, {
-				values: { username },
-				message: 'Username already taken'
+				form: {
+					...form,
+					message: 'Username already taken'
+				}
 			});
 
-		const id = generateUserID();
 		const passwordHash = await hash(password, {
 			memoryCost: 19456,
 			timeCost: 2,
@@ -104,15 +86,23 @@ export const actions: Actions = {
 		});
 
 		try {
-			await db.insert(table.user).values({ id, username, passwordHash });
+			const res = await db
+				.insert(table.user)
+				.values({ username, passwordHash })
+				.returning({ id: table.user.id });
 
 			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, id);
+			const session = await auth.createSession(sessionToken, res[0].id);
+
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (e) {
+			console.error(e);
+
 			return fail(500, {
-				values: { username },
-				message: 'An error occurred while creating your account'
+				form: {
+					...form,
+					message: 'An error occurred while creating your account'
+				}
 			});
 		}
 
@@ -120,9 +110,3 @@ export const actions: Actions = {
 		return redirect(302, redirectTo);
 	}
 };
-
-function generateUserID() {
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}

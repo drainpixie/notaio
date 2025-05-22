@@ -1,66 +1,86 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Button from '$lib/components/Button.svelte';
-	import FieldInput from '$lib/components/forms/FieldInput.svelte';
-	import Form from '$lib/components/forms/Form.svelte';
 	import { LogIn, UserPlus } from 'lucide-svelte';
-	import type { ActionData } from './$types';
+	import type { PageData } from './$types';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { schema } from './schema';
+	import { Control, Field, FieldErrors, Label } from 'formsnap';
 
-	let { form }: { form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
+
+	const form = superForm(data.form, {
+		validators: zodClient(schema),
+		resetForm: false
+	});
+
+	const { form: formData, enhance, message } = form;
 
 	let isRegistering = $state(false);
 
-	let username = $state(form?.values?.username || '');
-	let password = $state('');
-
 	function toggleMode() {
 		isRegistering = !isRegistering;
+		$message = undefined;
 	}
 </script>
 
-<Form {form} class="w-96">
-	<h1 class="mt-0 mb-6 text-2xl">{isRegistering ? 'Register' : 'Login'}</h1>
-	<form action={isRegistering ? '?/register' : '?/login'} method="post" use:enhance>
-		<FieldInput bind:value={username} name="username" type="text" autocomplete="username" />
-		<FieldInput
-			bind:value={password}
-			name="password"
-			type="password"
-			autocomplete="current-password"
-		/>
+<form action={isRegistering ? '?/register' : '?/login'} method="post" class="w-96" use:enhance>
+	<Field {form} name="username">
+		<Control>
+			{#snippet children({ props })}
+				<Label>Username</Label>
+				<input {...props} type="text" bind:value={$formData.username} autocomplete="username" />
+			{/snippet}
+		</Control>
+		<FieldErrors />
+	</Field>
 
-		<div class="flex gap-4">
-			<Button type="submit">
-				{#snippet iconL()}
-					{#if isRegistering}
-						<UserPlus size={18} />
-					{:else}
-						<LogIn size={18} />
-					{/if}
-				{/snippet}
+	<Field {form} name="password">
+		<Control>
+			{#snippet children({ props })}
+				<Label>Password</Label>
+				<input
+					{...props}
+					type="password"
+					bind:value={$formData.password}
+					autocomplete="current-password"
+				/>
+			{/snippet}
+		</Control>
+		<FieldErrors />
+	</Field>
 
+	<div class="flex gap-4 mt-2">
+		<Button type="submit">
+			{#snippet iconL()}
 				{#if isRegistering}
-					Register
+					<UserPlus size={18} />
 				{:else}
-					Login
+					<LogIn size={18} />
 				{/if}
-			</Button>
+			{/snippet}
 
-			<Button class="flex-1" type="button" onclick={toggleMode}>
-				{#snippet iconL()}
-					{#if isRegistering}
-						<LogIn size={18} />
-					{:else}
-						<UserPlus size={18} />
-					{/if}
-				{/snippet}
+			{#if isRegistering}
+				Register
+			{:else}
+				Login
+			{/if}
+		</Button>
 
+		<Button class="flex-1" type="button" onclick={toggleMode}>
+			{#snippet iconL()}
 				{#if isRegistering}
-					Already have an account
+					<LogIn size={18} />
 				{:else}
-					Don't have an account
+					<UserPlus size={18} />
 				{/if}
-			</Button>
-		</div>
-	</form>
-</Form>
+			{/snippet}
+
+			{#if isRegistering}
+				Already have an account
+			{:else}
+				Don't have an account
+			{/if}
+		</Button>
+	</div>
+</form>

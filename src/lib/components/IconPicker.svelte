@@ -103,7 +103,6 @@
 						{@const Icon = getLucideIcon(iconName)}
 						<Tooltip text={iconName}>
 							<button
-                
 								type="button"
 								class="flex items-center justify-center p-2 bg-transparent border-transparent border-solid border text-fg-primary rounded-sm cursor-pointer transition-colors ease-in-out hover:bg-surface-secondary"
 								class:selected={iconName === selectedIcon}

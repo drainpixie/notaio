@@ -9,18 +9,6 @@ import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
-import { nanoid } from 'nanoid';
-
-/**
- * TODO:
- *
- * const OPEN_AI_REGEX = /^sk-[A-Za-z0-9]{20,}$/;
- * const ANTROPHIC_REGEX = /^claude-[A-Za-z0-9_-]{20,}$/;
- *
- */
-
-export const generateID = (title: string) => [title.toLowerCase().replace(/\s+/g, '_') + '_' + nanoid(), title];
-
 
 export const PROCESSOR = unified()
 	.use(remarkBreaks)
@@ -33,7 +21,7 @@ export const PROCESSOR = unified()
 	.use(rehypeHighlight)
 	.use(rehypeStringify);
 
-// eslint-disable no-useless-escape
+// eslint-disable-next-line no-useless-escape
 export const KATEX_REGEX = /\$+([^\$]*?)\$+/g;
 
 export const MARKDOWN_DEFAULT_VALUE = [
