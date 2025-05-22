@@ -49,7 +49,7 @@
 </Sidebar>
 
 <div class="flex-col w-full h-full pl-40">
-	<Editor text={activeNote.content} bind:note={activeNote} settingsOpen={false} />
+	<Editor text={activeNote.content} bind:note={activeNote} />
 </div>
 
 <style lang="postcss">

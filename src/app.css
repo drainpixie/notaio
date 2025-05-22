@@ -96,7 +96,7 @@ input:disabled {
 		   text-sm leading-tight;
 }
 
-input[data-fs-error]  {
+input[data-fs-error] {
 	@apply border-red-500;
 	box-shadow: 0 0 0 2px color-mix(in oklch, red 10%, transparent);
 }

@@ -10,6 +10,26 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 
+export interface Command {
+	icon: typeof lucide.Icon;
+	name: string;
+	prefix: string;
+	suffix: string;
+}
+
+export const COMMANDS: Command[] = [
+	{ name: 'Code', icon: lucide.Code, prefix: '```lang ', suffix: '```' },
+	{ name: 'Link', icon: lucide.Link, prefix: '[', suffix: '](url)' },
+	{ name: 'Bold', icon: lucide.Bold, prefix: '**', suffix: '**' },
+	{ name: 'List', icon: lucide.List, prefix: '- ', suffix: '' },
+	{ name: 'Quote', icon: lucide.Quote, prefix: '> ', suffix: '' },
+	{ name: 'Italic', icon: lucide.Italic, prefix: '*', suffix: '*' },
+	{ name: 'Heading', icon: lucide.Heading, prefix: '# ', suffix: '' },
+	{ name: 'Checklist', icon: lucide.ListChecks, prefix: '- [ ] ', suffix: '' },
+	{ name: 'OrderedList', icon: lucide.ListOrdered, prefix: '1. ', suffix: '' },
+	{ name: 'Strikethrough', icon: lucide.Strikethrough, prefix: '~~', suffix: '~~' }
+];
+
 export const PROCESSOR = unified()
 	.use(remarkBreaks)
 	.use(remarkGfm)
