@@ -4,6 +4,9 @@
 	import { Search, SortAsc } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import IconPicker from '$lib/components/IconPicker.svelte';
+	import { debounce } from '$lib';
+	import equal from 'fast-deep-equal';
+	import type { Note } from '$lib/server/db/schema';
 
 	interface Props {
 		data: PageData;
@@ -24,19 +27,27 @@
 		if (note) activeNote = note;
 	}
 
-	function debounce(func: () => void, wait: number) {
-		let timeout: NodeJS.Timeout;
+	const save = debounce(async () => {
+		const changed: Note[] = notes.filter((note, i) => !equal(note, data.notes[i]));
+		if (changed.length === 0) return;
 
-		return () => {
-			clearTimeout(timeout);
-			timeout = setTimeout(func, wait);
-		};
-	}
+		const body = new FormData();
+		body.append('notes', JSON.stringify(changed));
+
+		await fetch('?/save', {
+			method: 'POST',
+			body
+		});
+	}, 1000);
 
 	$effect(() => {
-		document.title = activeNote.title;
+		document.title = activeNote.title ?? 'Notaio';
 
-		return () => document.title = "Notaio";
+		// TODO: Find more idiomatic way to trigger reactivity
+		Object.entries(activeNote);
+		save();
+
+		return () => (document.title = 'Notaio');
 	});
 </script>
 
@@ -61,13 +72,18 @@
 			value={note.id}
 		>
 			<IconPicker bind:selectedIcon={note.icon} />
-			<span bind:textContent={note.title} spellcheck="false" class="outline-none caret-accent" contenteditable></span>
+			<span
+				bind:textContent={note.title}
+				spellcheck="false"
+				class="outline-none caret-accent"
+				contenteditable
+			></span>
 		</button>
 	{/each}
 </Sidebar>
 
 <div class="flex-col w-full h-full pl-40">
-	<Editor text={activeNote.content} bind:note={activeNote} />
+	<Editor bind:note={activeNote} />
 </div>
 
 <style lang="postcss">

@@ -11,7 +11,7 @@
 		condition: boolean;
 	}
 
-	let { text, html, condition }: Props = $props();
+	let { text = $bindable(""), html, condition }: Props = $props();
 
 	$effect(() => {
 		if (condition) PROCESSOR.process(text).then((res) => (html = res.toString()));

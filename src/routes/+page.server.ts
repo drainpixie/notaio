@@ -1,6 +1,6 @@
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import { note } from '$lib/server/db/schema';
+import { note as table, type Note } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
@@ -10,10 +10,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
 	if (!user) throw new Error('User not found');
 
-	let notes = await db.select().from(note).where(eq(note.userId, user.id)).execute();
+	let notes = await db.select().from(table).where(eq(table.userId, user.id)).execute();
 	if (notes.length === 0) {
 		notes = await db
-			.insert(note)
+			.insert(table)
 			.values({
 				content: MARKDOWN_DEFAULT_VALUE,
 				userId: user.id,
@@ -38,5 +38,26 @@ export const actions: Actions = {
 		auth.deleteSessionTokenCookie(event);
 
 		return redirect(302, '/login');
+	},
+	save: async (event) => {
+		const data = await event.request.formData();
+		if (!data.has('notes')) return;
+
+		const notes: Note[] = JSON.parse(data.get('notes') as string);
+		if (notes.length === 0) return;
+
+		for (const note of notes) {
+			await db
+				.update(table)
+				.set({
+					tags: note.tags,
+					icon: note.icon,
+					title: note.title,
+					content: note.content,
+					updatedAt: new Date()
+				})
+				.where(eq(table.id, note.id))
+				.run();
+		}
 	}
 };

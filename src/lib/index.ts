@@ -80,17 +80,15 @@ export const MARKDOWN_DEFAULT_VALUE = [
 export const getLucideIcon = (name: string): typeof lucide.Component =>
 	lucide[name as keyof typeof lucide] as typeof lucide.Component;
 
-export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(
-  func: F,
-  waitFor: number,
-) => {
-  let timeout: NodeJS.Timeout
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function debounce<F extends (...args: any[]) => unknown>(
+	func: F,
+	wait: number,
+): (...args: Parameters<F>) => void {
+	let timeout: NodeJS.Timeout;
 
-  const debounced = (...args: Parameters<F>) => {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), waitFor)
-  }
-
-  return debounced
+	return function debounced(this: ThisParameterType<F>, ...args: Parameters<F>): void {
+		clearTimeout(timeout);
+		timeout = setTimeout(() => func.apply(this, args), wait);
+	};
 }
-
