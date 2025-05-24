@@ -4,7 +4,7 @@ type Theme = 'light' | 'dark';
 type Highlighting = 'duotone' | 'colour';
 
 let theme = $state<Theme>(getInitialTheme());
-let highlight = $state<Highlighting>('colour'); // TODO: Move to colour for normies
+let highlight = $state<Highlighting>('colour');
 
 function getInitialTheme(): Theme {
 	if (browser) {
