@@ -1,4 +1,3 @@
-import { writable, derived, get } from 'svelte/store';
 import { debounce } from '$lib';
 import equal from 'fast-deep-equal';
 import type { Note } from '$lib/server/db/schema';
@@ -20,10 +19,9 @@ const initialState: NotesState = {
 };
 
 function createNotesStore() {
-    const { subscribe, set, update } = writable<NotesState>(initialState);
+    const state = $state<NotesState>(initialState);
 
-    const debouncedSave = debounce(async () => {
-        const state = get({ subscribe });
+    const save = debounce(async () => {
         const changed = state.notes.filter((note, i) => !equal(note, state.originalNotes[i]));
 
         if (changed.length === 0) return;
@@ -32,7 +30,7 @@ function createNotesStore() {
             const body = new FormData();
             body.append('notes', JSON.stringify(changed));
 
-            const response = await fetch('?/save', {
+            const response = await fetch('/api/notes/save', {
                 method: 'POST',
                 body
             });
@@ -40,61 +38,56 @@ function createNotesStore() {
             if (!response.ok)
                 throw new Error('Failed to save notes');
 
-            update(state => ({
-                ...state,
-                originalNotes: [...state.notes],
-                error: null
-            }));
+            state.originalNotes = [...state.notes];
+            state.error = null;
         } catch (error) {
-            update(state => ({
-                ...state,
-                error: error instanceof Error ? error.message : 'Failed to save notes'
-            }));
+            state.error = error instanceof Error ? error.message : 'Failed to save notes';
         }
     }, 1000);
 
     return {
-        subscribe,
+        get notes() {
+            return state.notes;
+        },
+
+        get activeNote() {
+            return state.activeNote;
+        },
+
+        get isLoading() {
+            return state.isLoading;
+        },
+
+        get error() {
+            return state.error;
+        },
 
         initialize: (notes: Note[]) => {
-            set({
-                notes: [...notes],
-                activeNote: notes[0],
-                originalNotes: [...notes],
-                isLoading: false,
-                error: null
-            });
+            state.notes = [...notes];
+            state.activeNote = notes[0] || null;
+            state.originalNotes = [...notes];
+            state.isLoading = false;
+            state.error = null;
         },
 
         active: (note: Note) => {
-            update(state => ({
-                ...state,
-                activeNote: note
-            }));
+            state.activeNote = note;
         },
 
         update: (noteId: string, updates: Partial<Note>) => {
-            update(state => {
-                const notes = state.notes.map(note =>
-                    note.id === noteId ? { ...note, ...updates, updatedAt: new Date() } : note
-                );
+            state.notes = state.notes.map(note =>
+                note.id === noteId ? { ...note, ...updates, updatedAt: new Date() } : note
+            );
 
-                const activeNote = state.activeNote?.id === noteId
-                    ? { ...state.activeNote, ...updates, updatedAt: new Date() }
-                    : state.activeNote;
+            if (state.activeNote?.id === noteId) {
+                state.activeNote = { ...state.activeNote, ...updates, updatedAt: new Date() };
+            }
 
-                return {
-                    ...state,
-                    notes,
-                    activeNote
-                };
-            });
-
-            debouncedSave();
+            save();
         },
 
         add: async (noteData?: Partial<Note>) => {
-            update(state => ({ ...state, isLoading: true }));
+            state.isLoading = true;
 
             try {
                 const body = new FormData();
@@ -117,80 +110,55 @@ function createNotesStore() {
 
                 const newNote: Note = await response.json();
 
-                update(state => ({
-                    ...state,
-                    notes: [newNote, ...state.notes],
-                    activeNote: newNote,
-                    originalNotes: [newNote, ...state.originalNotes],
-                    isLoading: false,
-                    error: null
-                }));
+                state.notes = [newNote, ...state.notes];
+                state.activeNote = newNote;
+                state.originalNotes = [newNote, ...state.originalNotes];
+                state.isLoading = false;
+                state.error = null;
 
                 return newNote;
             } catch (error) {
-                update(state => ({
-                    ...state,
-                    isLoading: false,
-                    error: error instanceof Error ? error.message : 'Failed to create note'
-                }));
+                state.isLoading = false;
+                state.error = error instanceof Error ? error.message : 'Failed to create note';
                 throw error;
             }
         },
 
         delete: async (noteId: string) => {
-            update(state => ({ ...state, isLoading: true }));
+            state.isLoading = true;
 
             try {
                 const response = await fetch(`/api/notes/${noteId}`, {
                     method: 'DELETE'
                 });
 
-                if (!response.ok) {
+                if (!response.ok)
                     throw new Error('Failed to delete note');
+
+                state.notes = state.notes.filter(note => note.id !== noteId);
+                state.originalNotes = state.originalNotes.filter(note => note.id !== noteId);
+
+                if (state.activeNote?.id === noteId) {
+                    state.activeNote = state.notes[0] || null;
                 }
 
-                update(state => {
-                    const notes = state.notes.filter(note => note.id !== noteId);
-                    const originalNotes = state.originalNotes.filter(note => note.id !== noteId);
-                    const activeNote = state.activeNote?.id === noteId
-                        ? (notes[0] || null)
-                        : state.activeNote;
-
-                    return {
-                        ...state,
-                        notes,
-                        originalNotes,
-                        activeNote,
-                        isLoading: false,
-                        error: null
-                    };
-                });
+                state.isLoading = false;
+                state.error = null;
             } catch (error) {
-                update(state => ({
-                    ...state,
-                    isLoading: false,
-                    error: error instanceof Error ? error.message : 'Failed to delete note'
-                }));
+                state.isLoading = false;
+                state.error = error instanceof Error ? error.message : 'Failed to delete note';
                 throw error;
             }
         },
 
         clearError: () => {
-            update(state => ({
-                ...state,
-                error: null
-            }));
+            state.error = null;
         },
 
         save: () => {
-            debouncedSave();
+            save();
         }
     };
 }
 
-export const notesStore = createNotesStore();
-
-export const notes = derived(notesStore, $notesStore => $notesStore.notes);
-export const activeNote = derived(notesStore, $notesStore => $notesStore.activeNote);
-export const isLoading = derived(notesStore, $notesStore => $notesStore.isLoading);
-export const error = derived(notesStore, $notesStore => $notesStore.error);
+export const store = createNotesStore();

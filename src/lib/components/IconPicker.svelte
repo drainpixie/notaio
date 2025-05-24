@@ -11,7 +11,7 @@
 		showSearch = $bindable(true),
 		itemHeight = $bindable(16),
 		visibleRows = $bindable(5),
-		onIconChange = (icon: string) => null
+		onIconChange = () => null
 	} = $props();
 
 	let searchQuery = $state('');

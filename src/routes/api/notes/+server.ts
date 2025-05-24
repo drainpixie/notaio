@@ -50,3 +50,17 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
     return json(note);
 };
+
+export const DELETE: RequestHandler = async ({ params, cookies }) => {
+    const { user } = await validateSessionFromCookies(cookies);
+    if (!user) return error(401, { message: "Unauthorized" });
+
+    const { id } = params;
+    if (!id) return error(400, { message: "Invalid note ID" });
+
+    const note = await db.select().from(table).where(and(eq(table.id, id), eq(table.userId, user.id))).limit(1).execute();
+    if (!note) return error(404, { message: "Note not found" });
+
+    await db.delete(table).where(eq(table.id, id)).execute();
+    return json(note);
+};

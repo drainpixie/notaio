@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { createNote } from '$lib';
 	import IconPicker from './IconPicker.svelte';
 	import { Search, SortAsc, Plus, Trash, Star } from 'lucide-svelte';
-	import { notesStore as store, notes, activeNote } from '$lib/stores/notes.svelte';
+	import { store } from '$lib/stores/notes.svelte';
 	import type { Note } from '$lib/server/db/schema';
 
 	async function createNewNote() {
@@ -22,7 +21,7 @@
 
 	function handleNoteClick(event: MouseEvent) {
 		const button = event.currentTarget as HTMLButtonElement;
-		const note = $notes.find((n) => n.id === button.value);
+		const note = store.notes.find((n) => n.id === button.value);
 
 		if (note) store.active(note);
 	}
@@ -62,7 +61,7 @@
 			</button>
 			<button
 				class="muted group ease-modern duration-200 transition-colors"
-				onclick={() => alert('TODO: Delete')}
+				onclick={(event) => deleteNote(store.activeNote.id, event)}
 			>
 				<Trash class="group-hover:[&>*]:text-red-400" size={16} />
 			</button>
@@ -83,15 +82,18 @@
 			<span>Sort</span>
 		</button>
 
-		{#each $notes as note (note.id)}
+		{#each store.notes as note (note.id)}
 			<button
-				class:active={note.id === $activeNote?.id}
+				class:active={note.id === store.activeNote.id}
 				onclick={handleNoteClick}
 				aria-label={note.title}
 				title={note.title}
 				value={note.id}
 			>
-				<IconPicker onIconChange={(icon: string) => handleIconChange(note, icon)} selectedIcon={note.icon} />
+				<IconPicker
+					onIconChange={(icon: string) => handleIconChange(note, icon)}
+					selectedIcon={note.icon}
+				/>
 
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span
@@ -99,8 +101,8 @@
 					class="outline-none caret-accent"
 					contenteditable
 					onblur={(event) => handleTitleEdit(note, event)}
-					onkeydown={handleTitleKeydown}
-				>{note.title}</span>
+					onkeydown={handleTitleKeydown}>{note.title}</span
+				>
 			</button>
 		{/each}
 	</div>

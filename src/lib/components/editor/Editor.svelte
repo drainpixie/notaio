@@ -2,7 +2,7 @@
 	import { PROCESSOR } from '$lib';
 	import { createStack, execute, redo, undo, can } from '@pixie/rekishi';
 	import { onMount, tick } from 'svelte';
-	import { notesStore, activeNote, notes } from '$lib/stores/notes.svelte';
+	import { store } from '$lib/stores/notes.svelte';
 	import EditorToolbar from './EditorToolbar.svelte';
 	import EditorTextarea from './EditorTextarea.svelte';
 	import EditorPreview from './EditorPreview.svelte';
@@ -18,10 +18,10 @@
 	let textarea: HTMLTextAreaElement | undefined = $state();
 
 	let editor: EditorState = $state({
-		stack: createStack<string>($activeNote.content, { maxStackSize: 100 }),
-		last: $activeNote.content,
+		stack: createStack<string>(store.activeNote.content, { maxStackSize: 100 }),
+		last: store.activeNote.content,
 		mode: 'preview',
-		prevNoteId: $activeNote.id,
+		prevNoteId: store.activeNote.id,
 		parsed: ''
 	});
 
@@ -38,7 +38,7 @@
 			const newContent = editor.stack.current;
 			editor.last = newContent;
 
-			notesStore.update($activeNote.id, { content: newContent });
+			store.update(store.activeNote.id, { content: newContent });
 		}
 	}
 
@@ -48,7 +48,7 @@
 			const newContent = editor.stack.current;
 			editor.last = newContent;
 
-			notesStore.update($activeNote.id, { content: newContent });
+			store.update(store.activeNote.id, { content: newContent });
 		}
 	}
 
@@ -58,7 +58,7 @@
 			editor.last = newText;
 		}
 
-		notesStore.update($activeNote.id, { content: newText });
+		store.update(store.activeNote.id, { content: newText });
 	}
 
 	function handleModeChange(newMode: 'preview' | 'write') {
@@ -68,20 +68,20 @@
 	function handleMarkdownInsert(prefix: string, suffix: string) {
 		if (!textarea) return;
 
-		const old = $activeNote.content;
+		const old = store.activeNote.content;
 		const { selectionStart: start, selectionEnd: end } = textarea;
-		const selectedText = $activeNote.content.substring(start, end);
+		const selectedText = store.activeNote.content.substring(start, end);
 		const newText =
-			$activeNote.content.substring(0, start) +
+			store.activeNote.content.substring(0, start) +
 			prefix +
 			selectedText +
 			suffix +
-			$activeNote.content.substring(end);
+			store.activeNote.content.substring(end);
 
 		editor.stack = changeText(old, newText);
 		editor.last = newText;
 
-		notesStore.update($activeNote.id, { content: newText });
+		store.update(store.activeNote.id, { content: newText });
 
 		textarea.focus();
 		textarea.selectionStart = start + prefix.length;
@@ -89,16 +89,16 @@
 	}
 
 	$effect(() => {
-		if (editor.mode === 'preview' && $activeNote?.content && $activeNote.content !== '') {
-			PROCESSOR.process($activeNote.content).then((html) => (editor.parsed = html.toString()));
+		if (editor.mode === 'preview' && store.activeNote?.content && store.activeNote.content !== '') {
+			PROCESSOR.process(store.activeNote.content).then((html) => (editor.parsed = html.toString()));
 		}
 	});
 
 	$effect(() => {
-		if ($activeNote && $activeNote.id !== editor.prevNoteId) {
-			editor.stack = createStack<string>($activeNote.content || '', { maxStackSize: 100 });
-			editor.last = $activeNote.content || '';
-			editor.prevNoteId = $activeNote.id;
+		if (store.activeNote && store.activeNote.id !== editor.prevNoteId) {
+			editor.stack = createStack<string>(store.activeNote.content || '', { maxStackSize: 100 });
+			editor.last = store.activeNote.content || '';
+			editor.prevNoteId = store.activeNote.id;
 		}
 	});
 
@@ -107,7 +107,7 @@
 	});
 </script>
 
-{#if $activeNote}
+{#if store.activeNote}
 	<div class="bg-surface-primary">
 		<EditorToolbar
 			mode={editor.mode}
@@ -125,7 +125,7 @@
 		>
 			{#if editor.mode === 'write'}
 				<EditorTextarea
-					value={$activeNote.content}
+					value={store.activeNote.content}
 					bind:textarea
 					onTextChange={handleTextChange}
 					onUndo={handleUndo}
@@ -133,9 +133,9 @@
 				/>
 			{:else if editor.mode === 'preview'}
 				<EditorPreview
-					text={$activeNote.content}
+					text={store.activeNote.content}
 					html={editor.parsed}
-					condition={$activeNote.content !== ''}
+					condition={store.activeNote.content !== ''}
 				/>
 			{/if}
 		</div>
