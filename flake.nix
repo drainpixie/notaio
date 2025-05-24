@@ -30,8 +30,8 @@
           pre-commit-check = hooks.lib.${system}.run {
             src = ./.;
             hooks = {
-              # NOTE: doesn't support svelte enough
-              # biome.enable = true;
+              eslint.enable = true;
+              prettier.enable = true;
               alejandra.enable = true;
             };
           };
