@@ -30,6 +30,7 @@
           pre-commit-check = hooks.lib.${system}.run {
             src = ./.;
             hooks = {
+              convco.enable = true;
               eslint.enable = true;
               prettier.enable = true;
               alejandra.enable = true;
@@ -39,4 +40,3 @@
       }
     );
 }
-
