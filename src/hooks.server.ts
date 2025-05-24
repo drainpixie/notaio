@@ -17,8 +17,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		event.locals.user = null;
 		event.locals.session = null;
 
-		if (!isPublicPath)
-			throw redirect(302, `/login?redirectTo=${encodeURIComponent(path)}`);
+		if (!isPublicPath) throw redirect(302, `/login?redirectTo=${encodeURIComponent(path)}`);
 
 		return resolve(event);
 	}
@@ -34,8 +33,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		event.locals.user = null;
 		event.locals.session = null;
 
-		if (!isPublicPath)
-			throw redirect(302, `/login?redirectTo=${encodeURIComponent(path)}`);
+		if (!isPublicPath) throw redirect(302, `/login?redirectTo=${encodeURIComponent(path)}`);
 	}
 
 	return resolve(event);

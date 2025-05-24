@@ -21,7 +21,7 @@
 	});
 </script>
 
-<Sidebar /> 
+<Sidebar />
 
 <div class="flex-col w-full h-full pl-40">
 	{#if store.activeNote}

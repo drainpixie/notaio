@@ -73,9 +73,7 @@
 			onscroll={handleScroll}
 		>
 			{#if showSearch}
-				<div
-					class="flex items-center gap-2 mb-2 sticky top-0 bg-surface-primary z-20"
-				>
+				<div class="flex items-center gap-2 mb-2 sticky top-0 bg-surface-primary z-20">
 					<input
 						type="text"
 						placeholder="Search..."

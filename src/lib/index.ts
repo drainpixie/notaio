@@ -84,7 +84,7 @@ export const getLucideIcon = (name: string): typeof lucide.Component =>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function debounce<F extends (...args: any[]) => unknown>(
 	func: F,
-	wait: number,
+	wait: number
 ): (...args: Parameters<F>) => void {
 	let timeout: NodeJS.Timeout;
 
