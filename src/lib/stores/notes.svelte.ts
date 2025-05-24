@@ -3,160 +3,163 @@ import equal from 'fast-deep-equal';
 import type { Note } from '$lib/server/db/schema';
 
 interface NotesState {
-	notes: Note[];
-	activeNote: Note;
-	originalNotes: Note[];
-	isLoading: boolean;
-	error: string | null;
+    notes: Note[];
+    activeNote: Note;
+    originalNotes: Note[];
+    isLoading: boolean;
+    error: string | null;
 }
 
 const initialState: NotesState = {
-	notes: [],
-	activeNote: null as unknown as Note,
-	originalNotes: [],
-	isLoading: false,
-	error: null
+    notes: [],
+    activeNote: null as unknown as Note,
+    originalNotes: [],
+    isLoading: false,
+    error: null
 };
 
 function createNotesStore() {
-	const state = $state<NotesState>(initialState);
+    const state = $state<NotesState>(initialState);
 
-	const save = debounce(async () => {
-		const changed = state.notes.filter((note, i) => !equal(note, state.originalNotes[i]));
+    const save = debounce(async () => {
+        const changed = state.notes.filter((note, i) => !equal(note, state.originalNotes[i]));
 
-		if (changed.length === 0) return;
+        if (changed.length === 0) return;
 
-		try {
-			const body = new FormData();
-			body.append('notes', JSON.stringify(changed));
+        try {
+            const body = new FormData();
+            body.append('notes', JSON.stringify(changed));
 
-			const response = await fetch('/api/notes/save', {
-				method: 'POST',
-				body
-			});
+            const response = await fetch('/api/notes/save', {
+                method: 'PATCH',
+                body
+            });
 
-			if (!response.ok) throw new Error('Failed to save notes');
+            if (!response.ok) throw new Error('Failed to save notes');
 
-			state.originalNotes = [...state.notes];
-			state.error = null;
-		} catch (error) {
-			state.error = error instanceof Error ? error.message : 'Failed to save notes';
-		}
-	}, 1000);
+            state.originalNotes = [...state.notes];
+            state.error = null;
+        } catch (error) {
+            state.error = error instanceof Error ? error.message : 'Failed to save notes';
+        }
+    }, 1000);
 
-	return {
-		get notes() {
-			return state.notes;
-		},
+    return {
+        get notes() {
+            return state.notes;
+        },
 
-		get activeNote() {
-			return state.activeNote;
-		},
+        get activeNote() {
+            return state.activeNote;
+        },
 
-		get isLoading() {
-			return state.isLoading;
-		},
+        get isLoading() {
+            return state.isLoading;
+        },
 
-		get error() {
-			return state.error;
-		},
+        get error() {
+            return state.error;
+        },
 
-		initialize: (notes: Note[]) => {
-			state.notes = [...notes];
-			state.activeNote = notes[0] || null;
-			state.originalNotes = [...notes];
-			state.isLoading = false;
-			state.error = null;
-		},
+        initialize: (notes: Note[]) => {
+            state.notes = [...notes];
+            state.activeNote = notes[0] || null;
+            state.originalNotes = [...notes];
+            state.isLoading = false;
+            state.error = null;
+        },
 
-		active: (note: Note) => {
-			state.activeNote = note;
-		},
+        active: (note: Note) => {
+            state.activeNote = note;
+        },
 
-		update: (noteId: string, updates: Partial<Note>) => {
-			state.notes = state.notes.map((note) =>
-				note.id === noteId ? { ...note, ...updates, updatedAt: new Date() } : note
-			);
+        update: (noteId: string, updates: Partial<Note>) => {
+            state.notes = state.notes.map((note) =>
+                note.id === noteId ? { ...note, ...updates, updatedAt: new Date() } : note
+            );
 
-			if (state.activeNote?.id === noteId) {
-				state.activeNote = { ...state.activeNote, ...updates, updatedAt: new Date() };
-			}
+            if (state.activeNote?.id === noteId) {
+                state.activeNote = { ...state.activeNote, ...updates, updatedAt: new Date() };
+            }
 
-			save();
-		},
+            save();
+        },
 
-		add: async (noteData?: Partial<Note>) => {
-			state.isLoading = true;
+        add: async (noteData?: Partial<Note>) => {
+            state.isLoading = true;
 
-			try {
-				const body = new FormData();
-				if (noteData) {
-					Object.entries(noteData).forEach(([key, value]) => {
-						if (value !== undefined) {
-							body.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
-						}
-					});
-				}
+            try {
+                const body = new FormData();
+                if (noteData) {
+                    Object.entries(noteData).forEach(([key, value]) => {
+                        if (value !== undefined) {
+                            body.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+                        }
+                    });
+                }
 
-				const response = await fetch('/api/notes', {
-					method: 'POST',
-					body
-				});
+                const response = await fetch('/api/notes', {
+                    method: 'POST',
+                    body
+                });
 
-				if (!response.ok) {
-					throw new Error('Failed to create note');
-				}
+                if (!response.ok) {
+                    throw new Error('Failed to create note');
+                }
 
-				const newNote: Note = await response.json();
+                const newNote: Note = await response.json();
 
-				state.notes = [newNote, ...state.notes];
-				state.activeNote = newNote;
-				state.originalNotes = [newNote, ...state.originalNotes];
-				state.isLoading = false;
-				state.error = null;
+                state.notes = [newNote, ...state.notes];
+                state.activeNote = newNote;
+                state.originalNotes = [newNote, ...state.originalNotes];
+                state.isLoading = false;
+                state.error = null;
 
-				return newNote;
-			} catch (error) {
-				state.isLoading = false;
-				state.error = error instanceof Error ? error.message : 'Failed to create note';
-				throw error;
-			}
-		},
+                return newNote;
+            } catch (error) {
+                state.isLoading = false;
+                state.error = error instanceof Error ? error.message : 'Failed to create note';
+                throw error;
+            }
+        },
 
-		delete: async (noteId: string) => {
-			state.isLoading = true;
+        delete: async (noteId: string) => {
+            state.isLoading = true;
 
-			try {
-				const response = await fetch(`/api/notes/${noteId}`, {
-					method: 'DELETE'
-				});
+            const searchParams = new URLSearchParams();
+            searchParams.append('id', noteId);
 
-				if (!response.ok) throw new Error('Failed to delete note');
+            try {
+                const response = await fetch(`/api/notes?${searchParams}`, {
+                    method: 'DELETE'
+                });
 
-				state.notes = state.notes.filter((note) => note.id !== noteId);
-				state.originalNotes = state.originalNotes.filter((note) => note.id !== noteId);
+                if (!response.ok) throw new Error('Failed to delete note');
 
-				if (state.activeNote?.id === noteId) {
-					state.activeNote = state.notes[0] || null;
-				}
+                state.notes = state.notes.filter((note) => note.id !== noteId);
+                state.originalNotes = state.originalNotes.filter((note) => note.id !== noteId);
 
-				state.isLoading = false;
-				state.error = null;
-			} catch (error) {
-				state.isLoading = false;
-				state.error = error instanceof Error ? error.message : 'Failed to delete note';
-				throw error;
-			}
-		},
+                if (state.activeNote?.id === noteId) {
+                    state.activeNote = state.notes[0] || null;
+                }
 
-		clearError: () => {
-			state.error = null;
-		},
+                state.isLoading = false;
+                state.error = null;
+            } catch (error) {
+                state.isLoading = false;
+                state.error = error instanceof Error ? error.message : 'Failed to delete note';
+                throw error;
+            }
+        },
 
-		save: () => {
-			save();
-		}
-	};
+        clearError: () => {
+            state.error = null;
+        },
+
+        save: () => {
+            save();
+        }
+    };
 }
 
 export const store = createNotesStore();

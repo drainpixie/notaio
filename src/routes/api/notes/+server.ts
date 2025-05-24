@@ -8,69 +8,70 @@ import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 const note = z
-	.object({
-		icon: z.string().default('FileQuestion'),
-		title: z.string().default('Untitled'),
-		content: z.string().default(MARKDOWN_DEFAULT_VALUE),
-		tags: z.array(z.string())
-	})
-	.partial();
+    .object({
+        icon: z.string().default('FileQuestion'),
+        title: z.string().default('Untitled'),
+        content: z.string().default(MARKDOWN_DEFAULT_VALUE),
+        tags: z.array(z.string())
+    })
+    .partial();
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const { user } = await validateSessionFromCookies(cookies);
-	if (!user) return error(401, { message: 'Unauthorized' });
+    const { user } = await validateSessionFromCookies(cookies);
+    if (!user) return error(401, { message: 'Unauthorized' });
 
-	const formData = await request.formData();
-	const noteData = note.parse(Object.fromEntries(formData));
+    const formData = await request.formData();
+    const noteData = note.parse(Object.fromEntries(formData));
 
-	const data = await db
-		.insert(table)
-		.values({
-			userId: user.id,
-			content: MARKDOWN_DEFAULT_VALUE,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			...noteData
-		})
-		.returning()
-		.execute();
+    const data = await db
+        .insert(table)
+        .values({
+            userId: user.id,
+            content: MARKDOWN_DEFAULT_VALUE,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            ...noteData
+        })
+        .returning()
+        .execute();
 
-	return json(data[0]);
+    return json(data[0]);
 };
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
-	const { user } = await validateSessionFromCookies(cookies);
-	if (!user) return error(401, { message: 'Unauthorized' });
+    const { user } = await validateSessionFromCookies(cookies);
+    if (!user) return error(401, { message: 'Unauthorized' });
 
-	const { id } = params;
-	if (!id) return error(400, { message: 'Invalid note ID' });
+    const { id } = params;
+    if (!id) return error(400, { message: 'Invalid note ID' });
 
-	const note = await db
-		.select()
-		.from(table)
-		.where(and(eq(table.id, id), eq(table.userId, user.id)))
-		.limit(1)
-		.execute();
-	if (!note) return error(404, { message: 'Note not found' });
+    const note = await db
+        .select()
+        .from(table)
+        .where(and(eq(table.id, id), eq(table.userId, user.id)))
+        .limit(1)
+        .execute();
 
-	return json(note);
+    if (!note) return error(404, { message: 'Note not found' });
+    return json(note);
 };
 
-export const DELETE: RequestHandler = async ({ params, cookies }) => {
-	const { user } = await validateSessionFromCookies(cookies);
-	if (!user) return error(401, { message: 'Unauthorized' });
+export const DELETE: RequestHandler = async ({ url, cookies }) => {
+    const { user } = await validateSessionFromCookies(cookies);
+    if (!user) return error(401, { message: 'Unauthorized' });
 
-	const { id } = params;
-	if (!id) return error(400, { message: 'Invalid note ID' });
+    const id = url.searchParams.get('id');
+    if (!id) return error(400, { message: 'Invalid note ID' });
 
-	const note = await db
-		.select()
-		.from(table)
-		.where(and(eq(table.id, id), eq(table.userId, user.id)))
-		.limit(1)
-		.execute();
-	if (!note) return error(404, { message: 'Note not found' });
+    const note = await db
+        .select()
+        .from(table)
+        .where(and(eq(table.id, id), eq(table.userId, user.id)))
+        .limit(1)
+        .execute();
 
-	await db.delete(table).where(eq(table.id, id)).execute();
-	return json(note);
+    if (!note) return error(404, { message: 'Note not found' });
+
+    await db.delete(table).where(eq(table.id, id)).execute();
+    return json(note);
 };
