@@ -9,6 +9,7 @@ import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
+import type { Note } from './server/db/schema';
 
 export interface Command {
 	icon: typeof lucide.Icon;
@@ -91,4 +92,23 @@ export function debounce<F extends (...args: any[]) => unknown>(
 		clearTimeout(timeout);
 		timeout = setTimeout(() => func.apply(this, args), wait);
 	};
+}
+
+export async function createNote(note: Partial<Note>): Promise<Note> {
+	const body = new FormData();
+
+	for (const [key, value] of Object.entries(note)) {
+		body.append(key, value as string);
+	}
+
+	const response = await fetch('/api/notes', {
+		method: 'POST',
+		body,
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	});
+
+	if (!response.ok) throw new Error('Failed to create note');
+	return response.json();
 }

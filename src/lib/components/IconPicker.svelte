@@ -10,7 +10,8 @@
 		gridCols = $bindable(5),
 		showSearch = $bindable(true),
 		itemHeight = $bindable(16),
-		visibleRows = $bindable(5)
+		visibleRows = $bindable(5),
+		onIconChange = (icon: string) => null
 	} = $props();
 
 	let searchQuery = $state('');
@@ -47,6 +48,8 @@
 	function selectIcon(iconName: string) {
 		selectedIcon = iconName;
 		isOpen = false;
+
+		onIconChange(iconName);
 	}
 
 	$effect(() => {
@@ -54,8 +57,6 @@
 			containerRef.scrollTop = 0;
 			scrollTop = 0;
 		}
-
-		// selectedIcon = selectedIcon;
 	});
 </script>
 

@@ -1,21 +1,50 @@
 <script lang="ts">
-	import type { Note } from '$lib/server/db/schema';
-	import { Search, SortAsc } from 'lucide-svelte';
-	import type { Snippet } from 'svelte';
+	import { createNote } from '$lib';
 	import IconPicker from './IconPicker.svelte';
+	import { Search, SortAsc, Plus, Trash, Star } from 'lucide-svelte';
+	import { notesStore as store, notes, activeNote } from '$lib/stores/notes.svelte';
+	import type { Note } from '$lib/server/db/schema';
 
-	interface Props {
-		notes: Note[];
-		activeNote: Note;
+	async function createNewNote() {
+		await store.add().catch((error) => console.error('Failed to create note:', error));
 	}
 
-	let { notes, activeNote = $bindable() }: Props = $props();
+	async function deleteNote(id: string, event: MouseEvent) {
+		event.stopPropagation();
+
+		if (confirm('Are you sure you want to delete this note?')) {
+			await store
+				.delete(id)
+				.then(() => store.clearError())
+				.catch((error) => console.error('Failed to delete note:', error));
+		}
+	}
 
 	function handleNoteClick(event: MouseEvent) {
-		const id = (event.currentTarget as HTMLButtonElement).value;
-		const note = notes.find((note) => note.id === id);
+		const button = event.currentTarget as HTMLButtonElement;
+		const note = $notes.find((n) => n.id === button.value);
 
-		if (note) activeNote = note;
+		if (note) store.active(note);
+	}
+
+	function handleTitleEdit(note: Note, event: Event) {
+		const span = event.currentTarget as HTMLSpanElement;
+		const newTitle = span.textContent ?? 'Untitled';
+
+		if (newTitle !== note.title) {
+			store.update(note.id, { title: newTitle });
+		}
+	}
+
+	function handleIconChange(note: Note, icon: string) {
+		store.update(note.id, { icon });
+	}
+
+	function handleTitleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			(event.currentTarget as HTMLElement).blur();
+		}
 	}
 </script>
 
@@ -23,7 +52,28 @@
 	class="fixed top-0 left-0 w-40 h-full bg-surface-primary text-fg-primary border-r border-border
             z-50 flex flex-col transition-colors ease-modern"
 >
-	<div class="flex flex-col mt-14">
+	<div class="flex flex-col mt-13">
+		<div class="flex items-center justify-center">
+			<button
+				class="muted group ease-modern duration-200 transition-colors"
+				onclick={createNewNote}
+			>
+				<Plus class="group-hover:[&>*]:text-green-400" size={16} />
+			</button>
+			<button
+				class="muted group ease-modern duration-200 transition-colors"
+				onclick={() => alert('TODO: Delete')}
+			>
+				<Trash class="group-hover:[&>*]:text-red-400" size={16} />
+			</button>
+			<button
+				class="muted group ease-modern duration-200 transition-colors"
+				onclick={() => alert('TODO: Pin')}
+			>
+				<Star class="group-hover:[&>*]:text-yellow-400" size={16} />
+			</button>
+		</div>
+
 		<button class="muted" onclick={() => alert('TODO:')}>
 			<Search size={16} />
 			<span>Search</span>
@@ -33,21 +83,24 @@
 			<span>Sort</span>
 		</button>
 
-		{#each notes as note (note.id)}
+		{#each $notes as note (note.id)}
 			<button
-				class:active={note.id === activeNote.id}
+				class:active={note.id === $activeNote?.id}
 				onclick={handleNoteClick}
 				aria-label={note.title}
 				title={note.title}
 				value={note.id}
 			>
-				<IconPicker bind:selectedIcon={note.icon} />
+				<IconPicker onIconChange={(icon: string) => handleIconChange(note, icon)} selectedIcon={note.icon} />
+
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span
-					bind:textContent={note.title}
 					spellcheck="false"
 					class="outline-none caret-accent"
 					contenteditable
-				></span>
+					onblur={(event) => handleTitleEdit(note, event)}
+					onkeydown={handleTitleKeydown}
+				>{note.title}</span>
 			</button>
 		{/each}
 	</div>
