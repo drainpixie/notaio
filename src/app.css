@@ -33,6 +33,7 @@
 
 	--color-accent: var(--accent);
 	--color-border: var(--border);
+	--color-pinned: var(--pinned);
 
 	--ease-modern: cubic-bezier(0.4, 0, 0.2, 1);
 }

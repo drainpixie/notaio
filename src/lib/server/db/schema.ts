@@ -3,16 +3,16 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { nanoid } from 'nanoid';
 
 export const user = sqliteTable('user', {
-	id: text('id')
+	id: text()
 		.primaryKey()
 		.$defaultFn(() => nanoid()),
-	age: integer('age'),
-	username: text('username').notNull().unique(),
+	age: integer(),
+	username: text().notNull().unique(),
 	passwordHash: text('password_hash').notNull()
 });
 
 export const settings = sqliteTable('settings', {
-	id: text('id')
+	id: text()
 		.primaryKey()
 		.$defaultFn(() => nanoid()),
 	userId: text('user_id')
@@ -34,16 +34,17 @@ export const session = sqliteTable('session', {
 });
 
 export const note = sqliteTable('note', {
-	id: text('id')
+	id: text()
 		.primaryKey()
 		.$defaultFn(() => nanoid()),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
-	icon: text('icon').notNull().default('FileQuestion'),
-	title: text('title').notNull().default('Untitled'),
-	content: text('content').notNull(),
-	tags: text('tags', { mode: 'json' })
+	icon: text().notNull().default('FileQuestion'),
+	title: text().notNull().default('Untitled'),
+	content: text().notNull(),
+	pinned: integer({ mode: 'boolean' }).default(false),
+	tags: text({ mode: 'json' })
 		.notNull()
 		.$type<string[]>()
 		.default(sql`(json_array())`),

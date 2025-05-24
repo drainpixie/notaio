@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconPicker from './IconPicker.svelte';
-	import { Search, SortAsc, Plus, Trash, Star } from 'lucide-svelte';
+	import { Search, Plus, Trash, Star } from 'lucide-svelte';
 	import { store } from '$lib/stores/notes.svelte';
 	import type { Note } from '$lib/server/db/schema';
 
@@ -67,7 +67,7 @@
 			</button>
 			<button
 				class="muted group ease-modern duration-200 transition-colors"
-				onclick={() => alert('TODO: Pin')}
+				onclick={() => store.pin(store.activeNote.id)}
 			>
 				<Star class="group-hover:[&>*]:text-yellow-400" size={16} />
 			</button>
@@ -77,27 +77,25 @@
 			<Search size={16} />
 			<span>Search</span>
 		</button>
-		<button class="muted" onclick={() => alert('TODO:')}>
-			<SortAsc size={16} />
-			<span>Sort</span>
-		</button>
 
-		{#each store.notes as note (note.id)}
+		{#each store.sorted as note (note.id)}
 			<button
 				class:active={note.id === store.activeNote.id}
 				onclick={handleNoteClick}
 				aria-label={note.title}
 				title={note.title}
 				value={note.id}
+				class={note.pinned ? 'pinned' : ''}
 			>
 				<IconPicker
 					onIconChange={(icon: string) => handleIconChange(note, icon)}
 					selectedIcon={note.icon}
 				/>
 
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span
 					spellcheck="false"
+					role="textbox"
+					tabindex="-1"
 					class="outline-none caret-accent"
 					contenteditable
 					onblur={(event) => handleTitleEdit(note, event)}
@@ -122,6 +120,10 @@
 
 	button.active {
 		@apply bg-surface-secondary text-fg-primary;
+	}
+
+	button.pinned {
+		@apply font-bold;
 	}
 
 	span {

@@ -11,7 +11,8 @@
 		showSearch = $bindable(true),
 		itemHeight = $bindable(16),
 		visibleRows = $bindable(5),
-		onIconChange = () => null
+		onIconChange = () => null,
+		class: className = ''
 	} = $props();
 
 	let searchQuery = $state('');
@@ -63,7 +64,7 @@
 <Popup bind:isOpen>
 	{#snippet trigger()}
 		{@const Icon = getLucideIcon(selectedIcon)}
-		<Icon {size} id="selected-icon" />
+		<Icon {size} class={className} />
 	{/snippet}
 
 	{#snippet content()}
