@@ -8,6 +8,9 @@ onlyBuiltDependencies:
   - esbuild
 
 dependencies:
+  '@drainpixie/reki':
+    specifier: ^1.0.0
+    version: 1.0.0
   '@libsql/client':
     specifier: ^0.15.4
     version: 0.15.4
@@ -20,9 +23,6 @@ dependencies:
   '@oslojs/encoding':
     specifier: ^1.1.0
     version: 1.1.0
-  '@pixie/rekishi':
-    specifier: link:vendor/rekishi
-    version: link:vendor/rekishi
   '@tailwindcss/vite':
     specifier: ^4.1.6
     version: 4.1.6(vite@6.3.5)
@@ -166,6 +166,10 @@ packages:
     engines: {node: '>=6.9.0'}
     dev: false
     optional: true
+
+  /@drainpixie/reki@1.0.0:
+    resolution: {integrity: sha512-C+JceAPV9V0/h78UGUHIUsQcBAHDGjky10wxoXBDgmI9FaAOOytV0txigiO0bE+Oj066egQJS+JulPDSpz/J1w==}
+    dev: false
 
   /@drizzle-team/brocli@0.10.2:
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}

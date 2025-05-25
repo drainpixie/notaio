@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PROCESSOR } from '$lib';
-	import { createStack, execute, redo, undo, can } from '@pixie/rekishi';
+	import { createStack, execute, redo, undo, can } from '@drainpixie/reki';
 	import { onMount, tick } from 'svelte';
 	import { store } from '$lib/stores/notes.svelte';
 	import EditorToolbar from './EditorToolbar.svelte';

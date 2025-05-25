@@ -36,11 +36,11 @@
 		"vite": "^6.3.5"
 	},
 	"dependencies": {
+		"@drainpixie/reki": "^1.0.0",
 		"@libsql/client": "^0.15.4",
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
-		"@pixie/rekishi": "link:vendor/rekishi",
 		"@tailwindcss/vite": "^4.1.6",
 		"drizzle-orm": "^0.43.1",
 		"fast-deep-equal": "^3.1.3",
