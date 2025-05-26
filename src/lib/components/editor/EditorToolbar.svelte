@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Pencil, Book, Undo, Redo } from 'lucide-svelte';
+	import { Pencil, Book, Undo, Redo } from '@lucide/svelte';
 	import Tooltip from '../Tooltip.svelte';
 	import { COMMANDS, type Command } from '$lib';
 

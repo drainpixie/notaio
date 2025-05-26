@@ -1,4 +1,4 @@
-import * as lucide from 'lucide-svelte';
+import * as lucide from '@lucide/svelte';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeKatex from 'rehype-katex';
 import rehypeStringify from 'rehype-stringify';

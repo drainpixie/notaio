@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import { LogIn, UserPlus } from 'lucide-svelte';
+	import { LogIn, UserPlus } from '@lucide/svelte';
 	import type { PageData } from './$types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';

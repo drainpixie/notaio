@@ -5,7 +5,7 @@
 	import { schema } from './schema';
 	import { Control, Description, Field, FieldErrors, Label } from 'formsnap';
 	import Button from '$lib/components/Button.svelte';
-	import { Save } from 'lucide-svelte';
+	import { Save } from '@lucide/svelte';
 
 	let { data }: { data: PageData } = $props();
 

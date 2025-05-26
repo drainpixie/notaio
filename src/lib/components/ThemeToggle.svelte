@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getTheme, toggleTheme } from '$lib/stores/theme.svelte';
-	import { Moon, Sun } from 'lucide-svelte';
+	import { Moon, Sun } from '@lucide/svelte';
 
 	const { id } = $props();
 </script>

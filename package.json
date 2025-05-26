@@ -36,8 +36,10 @@
 		"vite": "^6.3.5"
 	},
 	"dependencies": {
+		"@drainpixie/moji": "^1.1.2",
 		"@drainpixie/reki": "^1.0.0",
 		"@libsql/client": "^0.15.4",
+		"@lucide/svelte": "^0.511.0",
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
@@ -46,7 +48,6 @@
 		"fast-deep-equal": "^3.1.3",
 		"formsnap": "^2.0.1",
 		"highlight.js": "^11.11.1",
-		"lucide-svelte": "^0.509.0",
 		"nanoid": "^5.1.5",
 		"rehype-highlight": "^7.0.2",
 		"rehype-katex": "^7.0.1",

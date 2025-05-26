@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Notebook } from 'lucide-svelte';
+	import { Notebook } from '@lucide/svelte';
 	import MobileMenu from './MobileMenu.svelte';
 
 	const { user } = $props();

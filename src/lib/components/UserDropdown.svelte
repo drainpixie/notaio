@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { User as TUser } from '$lib/server/db/schema';
-	import { ChevronDown, LogOut, Settings, User } from 'lucide-svelte';
+	import { ChevronDown, LogOut, Settings, User } from '@lucide/svelte';
 	import Tooltip from './Tooltip.svelte';
 	import Popup from './Popup.svelte';
 

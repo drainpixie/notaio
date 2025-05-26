@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getLucideIcon } from '$lib';
-	import * as lucide from 'lucide-svelte';
+	import * as lucide from '@lucide/svelte';
 	import Tooltip from './Tooltip.svelte';
 	import Popup from './Popup.svelte';
 

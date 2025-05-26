@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconPicker from './IconPicker.svelte';
-	import { Search, Plus, Trash, Star } from 'lucide-svelte';
+	import { Search, Plus, Trash, Star } from '@lucide/svelte';
 	import { store } from '$lib/stores/notes.svelte';
 	import type { Note } from '$lib/server/db/schema';
 

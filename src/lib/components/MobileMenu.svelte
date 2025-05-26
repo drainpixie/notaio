@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import type { User } from '$lib/server/db/schema';
-	import { Home, LogIn } from 'lucide-svelte';
+	import { Home, LogIn } from '@lucide/svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import Tooltip from './Tooltip.svelte';
 	import UserDropdown from './UserDropdown.svelte';
