@@ -83,9 +83,12 @@
 
 		store.update(store.activeNote.id, { content: newText });
 
-		textarea.focus();
-		textarea.selectionStart = start + prefix.length;
-		textarea.selectionEnd = start + prefix.length + selectedText.length;
+		tick().then(() => {
+			if (!textarea) return;
+			textarea.focus();
+			textarea.selectionStart = start + prefix.length;
+			textarea.selectionEnd = start + prefix.length + selectedText.length;
+		});
 	}
 
 	$effect(() => {

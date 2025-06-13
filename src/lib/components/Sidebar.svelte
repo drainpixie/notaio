@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconPicker from './IconPicker.svelte';
-	import { Search, Plus, Trash, Star } from '@lucide/svelte';
+	import { Plus, Trash, Star } from '@lucide/svelte';
 	import { store } from '$lib/stores/notes.svelte';
 	import type { Note } from '$lib/server/db/schema';
 
@@ -48,7 +48,7 @@
 </script>
 
 <div
-	class="fixed top-0 left-0 w-40 h-full bg-surface-primary text-fg-primary border-r border-border
+	class="sidebar fixed top-0 left-0 w-40 h-full bg-surface-primary text-fg-primary border-r border-border
             z-50 flex flex-col transition-colors ease-modern"
 >
 	<div class="flex flex-col mt-13">
@@ -72,11 +72,6 @@
 				<Star class="group-hover:[&>*]:text-yellow-400" size={16} />
 			</button>
 		</div>
-
-		<button class="muted" onclick={() => alert('TODO:')}>
-			<Search size={16} />
-			<span>Search</span>
-		</button>
 
 		{#each store.sorted as note (note.id)}
 			<button
