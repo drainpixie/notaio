@@ -1,12 +1,13 @@
 <script lang="ts">
 	import Navbar from '$lib/components/Navbar.svelte';
-	import { initHighlighting, initTheme } from '$lib/stores/theme.svelte.js';
+	import { getTheme, initHighlighting, initTheme, toggleTheme } from '$lib/stores/theme.svelte.js';
 	import { CommandBar, type Command } from '@drainpixie/moji';
 
 	import '../app.css';
-	import { Home, Plus } from '@lucide/svelte';
+	import { Home, Moon, Pin, Plus, Sun, Trash } from '@lucide/svelte';
 	import { store } from '$lib/stores/notes.svelte';
 	import { getLucideIcon } from '$lib';
+	import { goto } from '$app/navigation';
 
 	const { data, children } = $props();
 
@@ -18,7 +19,7 @@
 	const commands: Command[] = $derived([
 		{
 			text: 'Home',
-			trigger: () => console.log('Home'),
+			trigger: () => goto('/'),
 			icon: Home,
 			category: 'navigation',
 			hotkey: ['h']
@@ -33,16 +34,22 @@
 		{
 			text: 'Delete',
 			trigger: () => store.delete(store.activeNote.id),
-			icon: Plus,
+			icon: Trash,
 			category: 'actions',
 			hotkey: ['ctrl', 'd']
 		},
 		{
 			text: 'Pin',
 			trigger: () => store.pin(store.activeNote.id),
-			icon: Plus,
+			icon: Pin,
 			category: 'actions',
 			hotkey: ['ctrl', 'p']
+		},
+		{
+			text: 'Theme',
+			trigger: () => toggleTheme(),
+			icon: getTheme() === 'dark' ? Moon : Sun,
+			category: 'actions'
 		},
 
 		...store.sorted.map((note) => ({
